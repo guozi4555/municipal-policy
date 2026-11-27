@@ -8,7 +8,7 @@
   <title>水专业政策法规 | 市政政策与规范查询</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="./site.css">
-  <script type="module" src="./site.js?v=3"></script>
+  <script type="module" src="./site.js?v=4"></script>
 </head>
 <body>
   <header class="masthead">
@@ -50,6 +50,11 @@
         <select id="kind"><option value="">全部类型</option></select>
         <label for="issuer">发布机构</label>
         <select id="issuer"><option value="">全部机构</option></select>
+        <label id="download-label" for="download" hidden>全文获取</label>
+        <select id="download" hidden>
+          <option value="">全部规范</option>
+          <option value="yes">仅看可下载</option>
+        </select>
         <fieldset>
           <legend>发布日期</legend>
           <input type="date" id="from" aria-label="起始日期">

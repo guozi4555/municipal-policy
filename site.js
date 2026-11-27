@@ -3,7 +3,7 @@ const catalogs = {
   policies: { name: "动力专业政策法规", category: "领域", unit: "条法规政策" },
   standards: { name: "规划与设计规范", category: "专业", unit: "部规范" },
 };
-const filterFields = ["level", "topic", "kind", "issuer", "from", "to"];
+const filterFields = ["level", "topic", "kind", "issuer", "from", "to", "download"];
 const perPage = 18;
 const id = name => document.getElementById(name);
 const nav = [...document.querySelectorAll("[data-catalog]")];
@@ -19,6 +19,7 @@ function readUrl() {
   const catalog = Object.hasOwn(catalogs, candidate) ? candidate : "water";
   const sort = ["new", "old", "title"].includes(params.get("sort")) ? params.get("sort") : "new";
   const filters = Object.fromEntries(filterFields.map(name => [name, params.get(name) || ""]));
+  if (catalog !== "standards" || filters.download !== "yes") filters.download = "";
   const page = Math.max(1, parseInt(params.get("page"), 10) || 1);
   return { catalog, q: params.get("q") || "", sort, page, ...filters };
 }
@@ -31,7 +32,7 @@ function writeUrl(method = "replaceState") {
   if (state.sort !== "new") params.set("sort", state.sort);
   if (state.page > 1) params.set("page", String(state.page));
   const query = params.toString();
-  history[method](null, "", query ? location.pathname + "?" + query : location.pathname);
+  history[method](null, "", location.pathname + (query ? "?" + query : ""));
 }
 
 function syncForm(items) {
@@ -49,6 +50,12 @@ function syncForm(items) {
     id(name).value = state[name];
   }
   id("topic-label").textContent = category;
+  const showDownload = state.catalog === "standards";
+  if (id("download")) {
+    id("download-label").hidden = !showDownload;
+    id("download").hidden = !showDownload;
+    id("download").value = state.download;
+  }
   id("keyword").value = state.q;
   id("from").value = state.from;
   id("to").value = state.to;
@@ -65,6 +72,7 @@ function filterItems(items) {
     if (state.issuer && state.issuer !== item.issuer) return false;
     if (state.from && (!item.date || item.date < state.from)) return false;
     if (state.to && (!item.date || item.date > state.to)) return false;
+    if (state.download && !item.download) return false;
     if (!query) return true;
     const keywords = Array.isArray(item.keywords) ? item.keywords : [];
     const fields = [item.title, item.doc, item.issuer, ...item.topics, ...keywords];
@@ -100,7 +108,8 @@ function record(item) {
   const values = [item.level, item.kind, ...item.topics].filter(Boolean);
   tags.append(...[...new Set(values)].map(value => node("span", "record-tag", value)));
   const heading = node("h3");
-  heading.append(sourceLink(item.url, item.title));
+  const accessUrl = item.download?.url || item.reading || item.url;
+  heading.append(sourceLink(accessUrl, item.title));
   const meta = node("p", "record-meta");
   const fields = [
     item.doc && "文号 " + item.doc,
@@ -110,9 +119,21 @@ function record(item) {
   ];
   meta.append(...fields.filter(Boolean).map(value => node("span", "", value)));
   const actions = node("div", "record-actions");
-  actions.append(sourceLink(item.url, state.catalog === "standards" ? "查看规范来源" : "查看政策原文"));
+  const displayed = new Set();
+  if (item.download) {
+    actions.append(sourceLink(item.download.url, "下载 " + item.download.format));
+    displayed.add(item.download.url);
+  }
+  if (item.reading && !displayed.has(item.reading)) {
+    actions.append(sourceLink(item.reading, "在线阅读"));
+    displayed.add(item.reading);
+  }
+  if (!displayed.has(item.url)) {
+    actions.append(sourceLink(item.url, state.catalog === "standards" ? "查看规范来源" : "查看政策原文"));
+    displayed.add(item.url);
+  }
   for (const alternate of item.links || []) {
-    actions.append(sourceLink(alternate.url, alternate.label || "其他来源"));
+    if (!displayed.has(alternate.url)) actions.append(sourceLink(alternate.url, alternate.label || "其他来源"));
   }
   row.append(tags, heading, meta, actions);
   return row;
@@ -168,7 +189,7 @@ id("search").addEventListener("submit", event => {
   update({ q: id("keyword").value.trim() });
 });
 for (const name of [...filterFields, "sort"]) {
-  id(name).addEventListener("change", event => update({ [name]: event.target.value, q: id("keyword").value.trim() }));
+  id(name)?.addEventListener("change", event => update({ [name]: event.target.value, q: id("keyword").value.trim() }));
 }
 id("reset").addEventListener("click", () => update({
   q: "", sort: "new", ...Object.fromEntries(filterFields.map(name => [name, ""])),
