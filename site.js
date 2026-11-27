@@ -1,6 +1,6 @@
 const catalogs = {
-  water: { name: "涉水政策", category: "主题", unit: "条政策" },
-  policies: { name: "涉动力法规政策", category: "领域", unit: "条法规政策" },
+  water: { name: "水专业政策法规", category: "主题", unit: "条政策" },
+  policies: { name: "动力专业政策法规", category: "领域", unit: "条法规政策" },
   standards: { name: "规划与设计规范", category: "专业", unit: "部规范" },
 };
 const filterFields = ["level", "topic", "kind", "issuer", "from", "to"];
@@ -120,6 +120,7 @@ function record(item) {
 
 function render() {
   const config = catalogs[state.catalog];
+  document.title = config.name + " | 市政政策与规范查询";
   const items = data.catalogs[state.catalog];
   syncForm(items);
   for (const link of nav) {
