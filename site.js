@@ -66,7 +66,8 @@ function filterItems(items) {
     if (state.from && (!item.date || item.date < state.from)) return false;
     if (state.to && (!item.date || item.date > state.to)) return false;
     if (!query) return true;
-    const fields = [item.title, item.doc, item.issuer, ...item.topics];
+    const keywords = Array.isArray(item.keywords) ? item.keywords : [];
+    const fields = [item.title, item.doc, item.issuer, ...item.topics, ...keywords];
     return fields.some(field => textSearch(field).includes(query)) ||
       Boolean(number && numberSearch(item.doc).includes(number));
   }).sort((a, b) => {
@@ -183,7 +184,7 @@ addEventListener("popstate", () => {
 });
 
 try {
-  const response = await fetch("./catalog.json");
+  const response = await fetch("./catalog.json", { cache: "no-cache" });
   if (!response.ok) throw new Error("catalog");
   data = await response.json();
   id("edition").textContent = "政策资料更新于 " + data.policyDate + "（北京时间）";
