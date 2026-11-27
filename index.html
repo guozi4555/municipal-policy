@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="查询国家和北京市的涉水、涉动力法规政策与市政规划设计规范。">
+  <meta name="theme-color" content="#102b3d">
+  <title>市政政策与规范查询</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./site.css">
+  <script type="module" src="./site.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="wrap masthead-inner">
+      <div>
+        <h1>市政政策与规范查询</h1>
+        <p>国家与北京市政策文件、规划设计规范及来源链接</p>
+      </div>
+      <p class="edition" id="edition" hidden></p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <nav class="catalog-nav" aria-label="资料栏目">
+      <a href="./" data-catalog="water" aria-current="page">涉水政策 <span></span></a>
+      <a href="./?catalog=policies" data-catalog="policies">涉动力法规政策 <span></span></a>
+      <a href="./?catalog=standards" data-catalog="standards">规划与设计规范 <span></span></a>
+    </nav>
+
+    <form id="search" class="search" role="search">
+      <label for="keyword">搜索资料</label>
+      <div class="search-input">
+        <input type="search" id="keyword" name="q" placeholder="输入文件名称、文号或发布机构" autocomplete="off">
+        <button type="submit">搜索</button>
+      </div>
+    </form>
+
+    <div class="workspace">
+      <aside class="filter" aria-labelledby="filter-heading">
+        <div class="filter-title">
+          <h2 id="filter-heading">筛选</h2>
+          <button id="reset" type="button" class="text-button">重置</button>
+        </div>
+        <label for="level">层级</label>
+        <select id="level"><option value="">全部层级</option></select>
+        <label for="topic" id="topic-label">主题</label>
+        <select id="topic" aria-labelledby="topic-label"><option value="">全部主题</option></select>
+        <label for="kind">文件类型</label>
+        <select id="kind"><option value="">全部类型</option></select>
+        <label for="issuer">发布机构</label>
+        <select id="issuer"><option value="">全部机构</option></select>
+        <fieldset>
+          <legend>发布日期</legend>
+          <input type="date" id="from" aria-label="起始日期">
+          <input type="date" id="to" aria-label="截止日期">
+        </fieldset>
+      </aside>
+
+      <section class="results" aria-labelledby="result-heading">
+        <div class="result-bar">
+          <div>
+            <h2 id="result-heading">涉水政策</h2>
+            <p id="count" role="status">正在加载资料</p>
+          </div>
+          <label class="order">排序
+            <select id="sort" aria-label="排序">
+              <option value="new">日期从新到旧</option>
+              <option value="old">日期从旧到新</option>
+              <option value="title">按名称</option>
+            </select>
+          </label>
+        </div>
+        <div id="records"></div>
+        <nav id="pagination" class="pagination" aria-label="结果分页" hidden>
+          <button id="previous" type="button">上一页</button>
+          <span id="page-index"></span>
+          <button id="next" type="button">下一页</button>
+        </nav>
+      </section>
+    </div>
+  </main>
+
+  <footer class="wrap footer">本站汇集题名、文号和来源链接。条文及现行状态以发布机构公布的信息为准。</footer>
+  <noscript><p class="wrap">请启用 JavaScript 以搜索和筛选资料。</p></noscript>
+</body>
+</html>
